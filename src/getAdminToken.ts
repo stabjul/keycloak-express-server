@@ -1,11 +1,14 @@
+import { AuthDetails } from './authorizeUser'
 import { Request, Response, NextFunction } from 'express'
 import axios, { AxiosRequestConfig } from 'axios'
 import * as qs from 'qs'
+import { User } from './checkUserExists'
 
 declare global {
   // eslint-disable-next-line @typescript-eslint/no-namespace
   namespace Express {
     export interface Request {
+      userDetails: User
       adminToken: string
     }
   }
@@ -38,7 +41,6 @@ export const getAdminToken = async (
     const tokenResponse = await axios(config)
 
     req.adminToken = tokenResponse.data.access_token as string
-
     next()
 
     // return res.status(200).json({success: true})

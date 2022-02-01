@@ -2,6 +2,18 @@ import { Request, Response } from 'express'
 import axios, { AxiosRequestConfig } from 'axios'
 import * as qs from 'qs'
 
+export interface AuthDetails {
+  access_token: string
+  expires_in: number
+  refresh_expires_in: number
+  refresh_token: string
+  token_type: string
+  id_token: string
+  'not-before-policy': number
+  session_state: string
+  scope: string
+}
+
 export const authorizeUser = async (req: Request, res: Response) => {
   try {
     const data = qs.stringify({
@@ -22,9 +34,12 @@ export const authorizeUser = async (req: Request, res: Response) => {
     } as AxiosRequestConfig
 
     const tokenResponse = await axios(config)
-    return res
-      .status(200)
-      .json({ success: true, accessToken: tokenResponse.data.access_token })
+
+    return res.status(200).json({
+      success: true,
+      authDetails: tokenResponse.data,
+      userDetails: req.userDetails,
+    })
   } catch (e) {
     console.error(e)
     return res.status(500).json({
